@@ -1,0 +1,248 @@
+<template>
+<view class="waper">
+  <image class='waper-img' src='../images/bg.jpg'/>
+  <view class="main-inner">
+        <view class="header">
+            <view class="title"><text>添加收件人</text></view>
+        </view>
+        <view class="main">
+          <view class="main-itm">
+              <view class="section">
+                <view class="section__title">姓名：</view>
+                <input type="text" name="name" value="{{recName}}" bindinput="handleInputName" placeholder="必须与收件人为一致" />
+              </view>
+              <view class="section">
+                <view class="section__title">身份证号码：</view>
+                <input type="idcard" name="id" value="{{idNum}}" bindinput="handleInputId" placeholder="身份证号码" />
+              </view>
+              <view class="merch_img">
+                  <view class="indentityCard clearfix">
+                      <view class="identityCard_front" bindtap="handleUploadImg1">
+                          <view class="imgs">点击上传身份证正面</view>
+                          <image src="../images/id01.png" class="examples"/>
+                          <image src="{{cardFrontUrl}}" mode="aspecFill" class="paths" />
+                      </view>
+                      <view class="identityCard_front" bindtap="handleUploadImg2">
+                          <view class="imgs">点击上传身份证背面</view>
+                          <image src="../images/id02.png" class="examples"/>
+                          <image src="{{cardRearUrl}}" mode="aspecFill" class="paths" />
+                      </view>
+                  </view>
+              </view>
+              <view class="btn-area">
+                <button @tap="submitInfo" class="copy">提交</button>
+              </view>
+          </view>
+        </view>
+  </view>
+</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import api from '@/api/api'
+  import {HOST_URL} from '@/utils/constant'
+  export default class AddContacts extends wepy.page{
+    data={
+      recName: '',
+      idNum: '',
+      cardFrontUrl: '',
+      cardRearUrl: '',
+      saveFlag: false,
+      orderNum: ''
+    }
+    async uploadImage (flag) {
+      let res = await wepy.chooseImage({
+        count:1
+      })
+      tip.loading()
+      let data = await wepy.uploadFile({
+        url: HOST_URL + '/common/upload',
+        filePath: res.tempFilePaths[0],
+        name: 'file',
+      })
+      let result = JSON.parse(data.data)
+      if (result.code == 0){
+         flag ? this.cardFrontUrl = result.data : this.cardRearUrl = result.data
+         this.$apply()
+      } else {
+        tip.error(result.msg)
+      }
+      tip.loaded()
+    }
+    async submitUserInfo () {
+      let res = await api.submitUserInfoByPerson({
+        query: {
+          name: this.recName,
+          openid: wepy.getStorageSync('USER_OPENID'),
+          idNum: this.idNum,
+          cardFrontUrl: this.cardFrontUrl,
+          cardRearUrl: this.cardRearUrl,
+          saveStatus: 1
+        },
+        method: 'POST'
+      })
+      if(res.data.code == 0) {
+        await tip.confirm('上传清关信息成功')
+        wepy.navigateTo({
+          url: 'userslibrary'
+        })
+      } else {
+        tip.error(res.data.msg)
+      }
+    }
+    onLoad (option) {
+      this.orderNum = option.expNum == undefined? "": option.expNum
+    }
+    methods={
+      handleChangeFlag (e) {
+        this.saveFlag = e.detail.value
+      },
+      handleInputName (e) {
+        this.recName = e.detail.value
+      },
+      handleInputId (e) {
+        this.idNum = e.detail.value
+      },
+      handleUploadImg2 () {
+        this.uploadImage(false)
+      },
+      handleUploadImg1 () {
+        this.uploadImage(true)
+      },
+      submitInfo () {
+        let reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+        if (this.recName.length < 1 || this.recName.length >8) {
+          tip.error('姓名格式错误!')
+          return
+        }
+        if (this.idNum.length < 1 && !reg.test(this.idNum)) {
+          tip.error('身份证格式错误')
+          return
+        }
+        if(this.cardFrontUrl.length <1 || this.cardRearUrl.length <1) {
+          tip.error('请上传身份证图片')
+          return
+        }
+        this.submitUserInfo()
+      },
+      goUsersLibraty () {
+        wepy.navigateTo({
+          url: 'userslibrary?from=uploadCert&&expNum=' + this.orderNum
+        })
+      }
+    }
+  }
+</script>
+<style lang="less">
+/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+.itm-text{
+    font-size:32rpx;
+    color:#7b7b7b;
+}
+/*通用样式*/
+.waper{
+    width: 100%;
+    position: relative;
+}
+.waper .waper-img{
+  width:100%;
+  position:absolute;
+  z-index:-2;
+  min-height: 100vh;
+  height:100%;
+  top: -1em;
+}
+.main-inner{
+    background:#fff;
+    width:90%;
+    margin:0 auto;
+    padding:10rpx;
+    border-radius:11rpx;
+    overflow:hidden;
+    margin-bottom: 3em;
+    margin-top: 1em;
+}
+.header{
+    text-align: center;
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    border-bottom: 1rpx #ccc dashed;
+}
+.title text{
+    color: #000;
+    font-weight: 600;
+    font-size:40rpx;
+    margin-bottom: 1em;
+}
+.main{
+  margin-top:3vh;
+  margin-bottom:3vh;
+}
+.main-itm {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.copy{
+  color: #fff;
+  background-color: #ff3a4e;
+}
+
+.section{
+  display: flex;
+  flex-direction: row;
+  margin: 20rpx;
+  position:relative;
+}
+.btn-area{
+  margin: 20rpx;
+}
+button{
+  margin: 10rpx 0;
+}
+.section{
+  font-size: 35rpx;
+}
+.section__title{
+    font-weight: 600;
+    width:243rpx;
+}
+.swi-btn{
+  display:inherit-block;
+  position:relative;
+  right:-129rpx;
+}
+/*上传图片*/
+.paths{
+  width:230rpx;
+  height:150rpx;
+  position: absolute;
+  z-index: 3;
+  left:1em;
+  top:82rpx;
+}
+.identityCard_front{
+  width:50%;
+  float:left;
+  text-align:center;
+  font-size:35rpx;
+  font-weight: 600;
+  position: relative;
+  height: 246rpx;
+}
+.examples{
+  width:230rpx;
+  height:150rpx;
+  position: absolute;
+  z-index: 1;
+  left:1em;
+  top:82rpx;
+}
+</style>

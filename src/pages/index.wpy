@@ -1,0 +1,281 @@
+<template>
+  <view class='waper'>
+    <image class='waper-img' src='../images/bg.jpg'/>
+    <view class='header'>
+      <view class="logo">
+            <image src="../images/logo.png" alt="" />
+      </view>
+      <view class="title"><text>飞翩国际物流</text></view>
+      <view class="describe"><text>日本一站式物流服务商</text></view>
+      <view class="search">
+        <form>
+            <input type="text" placeholder="请输入您要搜索的内容..." bindinput="inputQuery" value="{{queryKeyword}}" />
+            <view class="button" @tap="serchBtn"><image class='btn-img' src='../images/search.png'/></view>
+        </form>
+      </view>
+    </view>
+    <view class="container">
+        <ul class="manifests">
+            <li class="manifest clearfix" wx:for="{{historyOrderList}}" wx:for-item="item" wx:key="{{index}}">
+                <view @tap="handleOrderHistory" data-num="{{item.expNum}}">
+                  <view class="manifest-header clearfix">
+                      <view class="maifest-header-title">
+                          <i class="icon">
+                            <image src="../images/logo-mi.png" alt="" />
+                          </i>
+                          <span>飞翩国际物流</span>
+                      </view>
+                      <view class="maifest-header-date">
+                          <span>{{item.queryDate}}</span>
+                      </view>
+                  </view>
+                  <view class="manifest-container">
+                      <view class="manifest-container-coding">
+                          <p>{{item.expNum}}</p>
+                      </view>
+                      <view class="manifest-container-information">
+                          <p wx:if="{{item.expLastRecord != undefined}}">{{item.expLastRecord.acceptTime + item.expLastRecord.acceptAddress + item.expLastRecord.remark}}</p>
+                          <p wx:else >暂时没有物流信息哦</p>
+                      </view>
+                  </view>
+                </view>
+            </li>
+        </ul>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import api from '@/api/api'
+  export default class Index extends wepy.page{
+    data={
+      historyOrderList:[],
+      queryKeyword:''
+    }
+    async onLoad(){
+      let res = await wepy.login()
+      console.log(res)
+      if (res.code) {
+        let data = await api.getUserOpenid({
+          query: {
+            code: res.code
+          }
+        })
+        if (data.data.code == 0) {
+          wepy.setStorageSync('USER_OPENID',data.data.data.openid)
+          let result = await api.getOrderHistory({
+            query: {
+              'openid': wepy.getStorageSync('USER_OPENID')
+            }
+          })
+          if (result.data.code == 0) {
+            if (result.data.data.length > 0) {
+              this.historyOrderList = result.data.data
+              this.$apply()
+            } else {
+              tip.error('没有数据哦!')
+            }
+          } else {
+            tip.error(result.data.msg)
+          }
+        } else {
+          tip.error('获取信息失败!')
+        }
+      }
+    }
+    methods={
+      serchBtn () {
+        if(this.queryKeyword.length !=13 ){
+          tip.error('订单号错误哦!')
+          return
+        }
+        var reg = new RegExp('^BS[0-9]{9}CN$')
+        if(reg.test(this.queryKeyword)){
+          wepy.navigateTo({
+                url: 'orderDetails?orderNum=' + this.queryKeyword
+          })
+        } else {
+          tip.error('订单号错误哦!')
+        }
+      },
+      inputQuery(e){
+        this.queryKeyword = e.detail.value
+        this.$apply()
+      },
+      handleOrderHistory(e){
+        let expNum = e.currentTarget.dataset.num
+        wepy.navigateTo({
+          url: 'orderDetails?orderNum=' + expNum
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+li{
+    list-style:none;
+}
+/*通用样式*/
+.waper{
+    width: 100%;
+    position: relative;
+}
+.waper .waper-img{
+  width:100%;
+  position:fixed;
+  z-index:-2;
+  height:100%;
+  min-height: 100vh;
+}
+.header{
+    text-align: center;
+    padding-left: 3.61%;
+    padding-right: 3.61%;
+    border-bottom: 1rpx rgba(29, 31, 51, 0.81) solid;
+}
+.logo{
+    width:100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 8vh;
+}
+.logo image{
+    margin-bottom: 2.66vh;
+    display: inline-block;
+    width: 170rpx;
+    height: 170rpx;
+}
+.header .title{
+  margin-bottom:1vh;
+}
+.header .title text{
+    color: #fff;
+    font-weight: 600;
+    font-size: 50rpx;
+}
+.header .describe{
+    padding-left: 10rpx;
+    margin-bottom:1vh;
+}
+.header .describe text{
+    font-size: 30rpx;
+    color: #6f7581;
+    letter-spacing: 10rpx;
+}
+/*input搜索框*/
+.search{
+  margin-bottom:1em;
+}
+form{
+    position:relative;
+    height:70rpx;
+    width:100%;
+    display:block;
+}
+.button {
+  border: 1px rgba(255, 255, 255, 0) solid;
+  height:1.4em;
+  width:1.4em;
+  cursor:pointer;
+  position:absolute;
+  background-color:rgba(0, 0, 0, 0);
+  top:0.3em;
+  right:0.5em;
+  z-index:5;
+}
+.btn-img{
+  width:45rpx;
+  height:45rpx;
+  position:relative;
+  background-color:rgba(0, 0, 0, 0);
+  top:7rpx;
+}
+button:active{
+    background-color:rgba(0, 0, 0, 0);
+}
+.search input{
+  color:#828183;
+  border: 2px solid rgba(173, 173, 173, 0.53);
+  border-radius:50rpx;
+  background:rgba(29, 31, 51, 0);
+  text-align:left;
+  padding-left:30rpx;
+  font-size:33rpx;
+  padding-top:14rpx;
+  padding-bottom:14rpx;
+  transition:.3s linear;
+}
+/*container物流消息*/
+.container{
+    padding-left: 3.61%;
+    padding-right: 3.61%;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+}
+.manifests{
+  border-bottom:1px #32344a solid;
+  background-color:rgba(30, 33, 56, 0.78);
+  border-radius:24rpx;
+}
+.manifest{
+  padding-left:1em;
+  padding-right:1em;
+  padding-top:3vh;
+  padding-bottom:3vh;
+  display:block;
+  border-bottom: 1px #32344a dashed;
+}
+.manifest:nth-last-child(1){
+  border-bottom: 1px rgba(255, 255, 255, 0) solid;
+}
+.manifest-container {
+    border-radius: 10rpx;
+    margin-top: 0.9em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border: 1px #2f324a solid;
+}
+.maifest-header-title{
+  float: left;
+}
+.maifest-header-date{
+  float: right;
+}
+.manifest .icon image{
+  width: 34rpx;
+  height: 34rpx;
+}
+.maifest-header-title span {
+  color:#fff;
+  font-size:34rpx;
+  line-height:34rpx;
+}
+.maifest-header-date span{
+  color: #a8a7a7;
+  font-size:34rpx;
+  line-height:34rpx;
+}
+.manifest-container-coding p {
+  font-size:30rpx;
+  color: #fff;
+  margin-bottom: 0.5em;
+}
+.manifest-container-information p {
+  font-size:30rpx;
+  color: #a8a7a7;
+}
+</style>

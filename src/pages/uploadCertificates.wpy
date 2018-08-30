@@ -1,0 +1,159 @@
+<template>
+	<view class="waper">
+  <image class='waper-img' src='../images/bg.jpg'/>
+  <view class="main-inner">
+        <view class="header">
+            <view class="title"><text>确认物流信息</text></view>
+        </view>
+        <view class="main">
+          <view class="main-itm">
+            <ol>
+              <li>
+                <image src='../images/number.png' class="icon"/> 
+                <text>物流单号：</text>
+                <text class="itm-text" wx:if="{{orderNum.length > 0 }}">{{orderNum}}</text>
+                <text class="itm-text" wx:else>未填写信息</text>
+              </li>
+              <li>
+                <image src='../images/user.png' class="icon"/> 
+                <text>收件人：</text>
+                <text class="itm-text" wx:if="{{orderNum.recipient > 0 }}">{{userInfo.recipient}}</text>
+                <text class="itm-text" wx:else>未填写信息</text>
+              </li>
+              <li>
+                <image src='../images/phone.png' class="icon"/> 
+                <text>手机号：</text>
+                <text class="itm-text" wx:if="{{orderNum.mobile > 0 }}">{{userInfo.mobile}}</text>
+                <text class="itm-text" wx:else>未填写信息</text>
+              </li>
+              <li>
+                <image src='../images/address.png' class="icon"/> 
+                <text>地址：</text>
+                <text class="itm-text" wx:if="{{orderNum.addr > 0 }}">{{userInfo.addr}}</text>
+                <text class="itm-text" wx:else>未填写信息</text>
+              </li>
+            </ol>
+          </view>
+          <view>
+            <button @tap='upload' class="copy">确认无误，上传清关证件</button>
+          </view>
+        </view>
+    </view>
+</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import api from '@/api/api'
+  export default class UploadCertificates extends wepy.page{
+    data={
+      orderNum: '',
+      userInfo: []
+    }
+    onLoad (option) {
+      this.orderNum = option.expNum == undefined? "": option.expNum
+      this.getUserInfo()
+    }
+    async getUserInfo () {
+      let res = await api.getUserInfo({
+        query: {
+          'expressNum': this.orderNum
+        }
+      })
+      console.log(res)
+      if(res.data.code == 0) {
+        this.userInfo = res.data.data
+      } else {
+        tip.error(res.data.msg)
+      }
+    }
+    methods={
+      upload () {
+        wepy.navigateTo({
+          url: 'uploadCertificates-add?expNum=' + this.orderNum
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+ol{
+  padding:0.5em 0;
+  display:block;
+}
+li{
+    display:block;
+    font-size:39rpx;
+    line-height:39px;
+    border-bottom:1rpx #ccc dashed;
+    margin-bottom:1em;
+}
+.icon{
+    width:60rpx;
+    height:60rpx;
+    margin-bottom:-12rpx;
+    margin-right:13rpx;
+}
+.itm-text{
+    font-size:32rpx;
+    color:#7b7b7b;
+}
+/*通用样式*/
+.waper{
+    width: 100%;
+    position: relative;
+}
+.waper .waper-img{
+  width:100%;
+  position:absolute;
+  z-index:-2;
+  min-height: 100vh;
+  height:100%;
+  top: -1em;
+}
+.main-inner{
+    background:#fff;
+    width:90%;
+    margin:0 auto;
+    padding:10rpx;
+    border-radius:11rpx;
+    overflow:hidden;
+    margin-bottom: 3em;
+    margin-top: 1em;
+}
+.header{
+    text-align: center;
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    border-bottom: 1rpx #ccc dashed;
+}
+.title text{
+    color: #000;
+    font-weight: 600;
+    font-size:40rpx;
+    margin-bottom: 1em;
+}
+.main{
+  margin-top:3vh;
+  margin-bottom:3vh;
+  padding-left:1em;
+  padding-right:1em;
+}
+.main-itm {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.copy{
+  color: #fff;
+  background-color: #ff3a4e;
+}
+</style>

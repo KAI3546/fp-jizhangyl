@@ -1,0 +1,136 @@
+<template>
+<view class="waper">
+  <view class="header">
+    <image class="header-img" src="../images/bg.jpg"/>
+    <view class="userinfo">
+      <view class="usersimage">
+        <open-data type="userAvatarUrl" class="imagestyle"></open-data>
+      </view>
+      <view class="usersname">
+        <open-data type="userNickName" lang="zh_CN" class="namestyle"></open-data>
+      </view>
+    </view>
+  </view>
+  <view class="main">
+    <ol>
+      <li @tap="handleusers">
+        <image src='../images/userslibrary.png' class="icon"/> 
+        <text>收件人库</text>
+        <image class="into" src='../images/into.png'/>
+      </li>
+    </ol>
+  </view>
+</view>
+</template>
+
+<script>
+	import wepy from 'wepy'
+  export default class Personal extends wepy.page{
+    data={
+     
+    }
+    onLoad () {
+
+    }
+    methods={
+      handleusers () {
+        wepy.navigateTo({
+          url: 'userslibrary'
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+page{
+  background: #f3f3f3;
+}
+.header{
+  position: relative;
+}
+.header-img{
+  position: absolute;
+  width: 100%;
+  top: 0;
+  z-index: -5;
+}
+.container{
+  text-align: center;
+}
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top:2em;
+  padding-bottom:3em;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+  border:4rpx #fff solid;
+}
+.userinfo-nickname {
+  color: #aaa;
+}
+.usermotto {
+  margin-top: 200px;
+}
+ol{
+  width: 100%;
+  display: block;
+  flex-direction:column;
+  margin-top:30rpx;
+  margin-bottom: 10rpx;
+  background:#fff;
+}
+li{
+  display: block;
+  font-size:35rpx;
+  line-height:35rpx;
+  padding-left:20rpx;
+  padding-right:20rpx;
+  border-bottom:1rpx #efefef dashed;
+  padding-top:15rpx;
+  padding-bottom:26rpx;
+  position: relative;
+}
+.icon{
+    width:60rpx;
+    height:60rpx;
+    margin-bottom:-16rpx;
+    margin-right:13rpx;
+}
+.into{
+  width:30rpx;
+  height:30rpx;
+  position:absolute;
+  top:32rpx;
+  right:31rpx;
+}
+li text{
+  display: inline-block;
+}
+.usersimage{
+  width:128rpx;
+  height:128rpx;
+  border-radius: 50%;
+}
+.imagestyle{
+  width:128rpx;
+  height:128rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+}
+.usersname{
+  margin-top:20rpx;
+}
+.namestyle{
+  margin: 20rpx;
+  color: #aaa;
+}
+</style>

@@ -1,0 +1,277 @@
+<template>
+	<view class="waper">
+  <view class="main-inner">
+        <view class="header">
+            <view class="logo">
+                <image src="../images/feipian.png" alt=""/>
+            </view>
+            <view class="title"><text>飞翩国际物流</text></view>
+            <view class="query-upload">
+                <ul class="clearfix">
+                    <li class="pin">
+                        <button @tap="queryQuota" class="query button" >查询个人年消费额度</button>
+                    </li>
+                    <li class="pin">
+                        <button wx:if="{{!orderStatus}}" @tap="uploadCertificates" class="upload button">上传清关证件</button>
+                        <button wx:if="{{orderStatus}}" disabled class="upload button" @tap="handleClick" style="background:gray;">已传清关证件</button>
+                    </li>
+                </ul>
+            </view>
+            <p class="order-number">{{orderNum}}</p>
+        </view>
+        <view class="main">
+            <view class="order-time">
+                <!-- <view class="time">耗时<span>20</span>小时</view> -->
+                <view class="information">
+                  <ul class="time-axis">
+                      <li class="time-axis-item" wx:if="{{orderInfo.length == 0}}">
+                          <view class="time-axis-new"><span></span></view>
+                          <view class="time-axis-title">暂时没有物流信息</view>
+                      </li>
+                      <li class="time-axis-item" wx:for="{{orderInfo}}" wx:for-item="item" wx:key="{{index}}">
+                          <view class="time-axis-new"><span></span></view>
+                          <view class="time-axis-title">[{{item.acceptAddress}}] /t{{item.remark}}</view>
+                          <p class="time-axis-achievement">{{item.acceptTime}}</p>
+                      </li>
+                  </ul>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import api from '@/api/api'
+  export default class OrderDetails extends wepy.page{
+    data={
+      orderStatus: false,
+      orderNum: '',
+      orderInfo:[]
+    }
+    onLoad (option) {
+      this.orderNum = option.orderNum == undefined? "": option.orderNum
+      this.getOrderDetails()
+    }
+    async getOrderDetails () {
+      let res = await api.getOrderDetails({
+        query: {
+          'openid': wepy.getStorageSync('USER_OPENID'),
+          'expNum': this.orderNum
+        }
+      })
+      if (res.data.code == 0){
+        this.orderInfo = res.data.data.traces
+        this.orderStatus = res.data.data.checkStatus
+        this.$apply()
+      } else {
+        tip.error(res.data.msg)
+      }
+    }
+    methods={
+      queryQuota () {
+        wepy.navigateTo({
+          url: 'queryQuota'
+        })
+      },
+      uploadCertificates () {
+        wepy.navigateTo({
+          url: 'uploadCertificates?expNum='+this.orderNum
+        })
+      },
+      handleClick () {
+        console.log('111')
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+	/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+li{
+    display: block;
+    list-style:none;
+}
+/*通用样式*/
+page{
+  background: url("http://tuku.wupengzhen.xin/FeiPianWL/bg.jpg") fixed center center no-repeat;
+    background-size: cover;
+}
+.waper{
+    width: 100%;
+    padding-top:1em;
+}
+.main-inner{
+    background:#fff;
+    width:90%;
+    margin:0 auto;
+    padding:10rpx;
+    border-radius:11rpx;
+    overflow:hidden;
+}
+.header{
+    text-align: center;
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    border-bottom: 1rpx #ccc dashed;
+}
+.logo image{
+    width: 170rpx;
+    height: 170rpx;
+}
+.logo p{
+    font-size: 1.2em;
+    font-weight: 600;
+}
+.title text{
+    color: #000;
+    font-weight: 600;
+    font-size: 50rpx;
+}
+.query-upload{
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+.query-upload ul{
+    width: 90%;
+    margin: 0 auto;
+}
+.query-upload ul li:nth-of-type(1){
+    float: left;
+}
+.query-upload ul li:nth-of-type(2){
+    float: right;
+}
+.query-upload ul li:nth-of-type(1) button{
+  background-color: #2b2b2b;
+}
+.query-upload ul li:nth-of-type(2) button{
+  background-color: #d80000;
+  color:#fff;
+}
+.order-number{
+    margin: 4rpx 0;
+    color: #5a5a5a;
+}
+.doneupload{
+  background-color: green;
+}
+.button {
+    background-color:#adadad;
+    border-radius:1em;
+    color:white;
+    padding:9rpx 25rpx;
+    text-align:center;
+    text-decoration:none;
+    display:inline-block;
+    font-size:35rpx;
+    line-height:53rpx;
+    margin:4rpx 2rpx;
+    cursor:pointer;
+}
+.main{
+  margin-top:3vh;
+  margin-bottom: 3vh;
+}
+/*时间轴*/
+.time{
+    text-align: center;
+    color: #4a4a4a;
+    margin: 1em 0;
+}
+.information{
+  padding-left: 27rpx;
+  padding-right: 27rpx;
+}
+.time-axis{
+    margin:0;
+    position:relative;
+    display:block;
+}
+
+.time-axis:before{
+    content: '';
+    display: block;
+    position: absolute;
+    left: 20rpx;
+    top: 10rpx;
+    width: 3rpx;
+    height: 100%;
+    background-color: #e4e4e4;
+}
+.time-axis-item{
+    list-style:none;
+    position:relative;
+    line-height:1em;
+    font-size:28rpx;
+    color:#141414;
+    margin:50rpx 0;
+    padding-left:2.5em;
+}
+.time-axis-achievement{
+    margin: 0;
+}
+.time-axis-new{
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #666;
+}
+
+.time-axis-new span{
+    position:absolute;
+    right:-32rpx;
+    top:35%;
+    display:block;
+    width:18rpx;
+    height:18rpx;
+    border:5rpx solid #ccc;
+    border-radius:100%;
+    background-color:#fff;
+}
+.time-axis-new span:after{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 7rpx;
+    height: 7rpx;
+    margin: auto;
+    background-color: #ccc;
+    border: 1rpx solid #ccc;
+    border-radius: 100%;
+}
+
+.time-axis-item:nth-child(1) .time-axis-new span{
+    border-color: #ff707e;
+}
+.time-axis-item:nth-child(1) .time-axis-title{
+    color: #ff707e;
+}
+.time-axis-item:nth-child(1) .time-axis-new span:after{
+    background-color: #ff707e;
+    border-color: #ff707e;
+}
+.time-axis-title{
+    font-size:33rpx;
+    line-height:33rpx;
+}
+.time-axis-achievement{
+    font-size:26rpx;
+    line-height:26rpx;
+    color:#5a5a5a;
+    margin-top:10rpx;
+}
+/*时间轴*/
+</style>

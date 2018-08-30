@@ -1,0 +1,133 @@
+<template>
+<view class="waper">
+  <image class='waper-img' src='../images/bg.jpg'/>
+  <view class="main-inner">
+        <view class="header">
+            <view class="title"><text>跨境电子商务年度个人额度查询</text></view>
+        </view>
+        <view class="main">
+          <text class="notice">2016年3月24日，财政部、海关总署、国家税务总局共同发布了《关于跨境电子商务零售进口税收政策的通知》，其中包含跨境电子商务零售进口税收的新政策。《通知》规定，自2016年4月8日起，跨境电子商务零售进口商品将不再按邮递物品征收行邮税，而是按货物征收关税和进口环节增值税、消费税，以推动跨境电商健康发展。</text>
+          <view class="main-itm">
+            <p class="main-itm-title">个人跨境电商包裹</p>
+            <ol>
+              <li>01.单个包裹不能超过2000元。</li>
+              <li>02.个人年度消费额不能超过20000元。</li>
+            </ol>
+          </view>
+          <view class="main-itm">
+            <p class="main-itm-title">如何查询个人额度</p>
+            <ol>
+              <li>01.复制下方海关总署的官网进行查询 <text class="link" selectable="true" style="word-break: break-all;">{{link||''}}</text> <!-- 复制的对象--></li>
+              <li>02.打开safari或其他手机浏览器进行访问。</li>
+            </ol>
+          </view>
+          <view>
+            <button bindtap='show' class="copy">复制上方链接</button>
+          </view>
+        </view>
+    </view>
+</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class QueryQuota extends wepy.page{
+    data = {
+      link: 'http://ceb2pub.chinaport.gov.cn/limit/outIndexs'
+    }
+    methods = {
+      show() {
+        let that = this
+        wx.setClipboardData({
+          data: that.data.link,
+          success() {
+            that.setData({
+              url: 'url2'
+            })
+            console.log('success')
+          }
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+li{
+    display: block;
+    font-size:32rpx;
+    line-height: 30px;
+}
+/*通用样式*/
+.waper{
+    width: 100%;
+    position: relative;
+}
+.waper .waper-img{
+  width:100%;
+  position:absolute;
+  z-index:-2;
+  min-height: 850rpx;
+  height:115%;
+  top: -1em;
+}
+.main-inner{
+    background:#fff;
+    width:90%;
+    margin:0 auto;
+    padding:10rpx;
+    border-radius:11rpx;
+    overflow:hidden;
+    margin-bottom: 3em;
+    margin-top: 1em;
+}
+.header{
+    text-align: center;
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    border-bottom: 1rpx #ccc dashed;
+}
+.title text{
+    color: #000;
+    font-weight: 600;
+    font-size:40rpx;
+    margin-bottom: 1em;
+}
+.main{
+  margin-top:3vh;
+  margin-bottom:3vh;
+  padding-left:1em;
+  padding-right:1em;
+}
+.main-itm {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.main-itm-title{
+  color: #000;
+  font-weight: 600;
+  font-size:32rpx;
+  margin-bottom: 1em;
+}
+.notice{
+  text-indent:2em;
+  display:block;
+  font-size:32rpx;
+  line-height:30px;
+}
+.link{
+  color: #ff3d3d;
+  display: block;
+}
+.copy{
+  color: #fff;
+  background-color: #ff3a4e;
+}
+</style>

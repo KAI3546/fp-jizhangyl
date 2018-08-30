@@ -1,0 +1,199 @@
+<template>
+	<view class="waper">
+  <!-- 添加新的联系人 -->
+  <view class="addContacts">
+    <view class="add-item lisy" @tap="addContacts">
+      <image src='../images/add.png' class="icon"/>
+        <text>添加新联系人</text>
+        <image class="into" src='../images/into.png'/>
+    </view>
+  </view>
+  <!-- 联系人列表 -->
+  <view class="contacts">
+    <view class="contacts-item lisy clearfix" wx:for="{{userLibrary}}" wx:for-item="item" wx:key="{{index}}">
+      <view  @tap="selectUser" data-index="{{index}}">
+        <view class="headportrait">
+          <text>{{item.name}}</text>
+        </view>
+        <view class="information">
+          <text class="infname">{{item.name}}</text>
+          <text class="infid">{{item.idNum}}</text>
+        </view>
+      </view>
+      <view class="edit" @tap="delUserLibrary" data-id="{{item.id}}" data-index="{{index}}">
+        <image class="icon edit-img" src="../images/del.png"/>
+      </view>
+    </view>    
+  </view>
+</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import tip from '@/utils/tip'
+  import api from '@/api/api'
+  export default class UserLibrary extends wepy.page{
+    data={
+      userLibrary: [],
+      expNum: ''
+    }
+    onLoad (option) {
+      this.expNum = option.expNum == undefined ? '' : option.expNum
+      this.getUserLibrary()
+    }
+    async getUserLibrary () {
+      let res = await api.getUserLibrary({
+        query: {
+          'openid': wepy.getStorageSync('USER_OPENID')
+        }
+      })
+      if (res.data.code == 0) {
+        this.userLibrary = res.data.data
+        this.$apply()
+      } else {
+        tip.error(res.data.msg)
+      }
+    }
+    async delUserLibraryById (id, index) {
+      let res = await api.delUserLibraryById({
+        query: {
+          id: id
+        }
+      })
+      console.log(res)
+      if (res.data.code == 0) {
+        this.userLibrary.splice(index, 1)
+        this.$apply()
+      } else {
+        tip.error(res.data.msg)
+      }
+    }
+    async submitUserInfo (index) {
+      let res = await api.submitUserInfo({
+        query: {
+          name: this.userLibrary[index].name,
+          openid: wepy.getStorageSync('USER_OPENID'),
+          idNum: this.userLibrary[index].idNum,
+          cardFrontUrl: this.userLibrary[index].cardFront,
+          cardRearUrl: this.userLibrary[index].cardRear,
+          saveStatus: 0,
+          expressNum: this.expNum
+        },
+        method: 'POST'
+      })
+      if(res.data.code == 0) {
+        await tip.confirm('清关信息上传成功,请等待仓库发货')
+        wepy.navigateTo({
+          url: 'index'
+        })
+      } else {
+        tip.error('操作失败,请重试')
+      }
+    }
+    methods={
+      addContacts () {
+        wx.navigateTo({
+          url: 'addContacts'
+        })
+      },
+      async delUserLibrary (e) {
+        await tip.confirm('确认删除收件人信息')
+        let index = e.currentTarget.dataset.index
+        let id = e.currentTarget.dataset.id
+        this.delUserLibraryById (id, index)
+      },
+      async selectUser (e) {
+        if (this.expNum == '') {
+          return
+        }
+        let index = e.currentTarget.dataset.index
+        await tip.confirm('确认使用此清关信息')
+        this.submitUserInfo(index)
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+/*通用样式*/
+.clearfix:before,
+.clearfix:after{
+    content: " ";
+    display: table;
+    clear: both;
+}
+.lisy{
+  font-size:35rpx;
+  line-height:35rpx;
+  padding-left:20rpx;
+  padding-right:20rpx;
+  padding-top:15rpx;
+  padding-bottom:26rpx;
+  background-color: #fff;
+}
+/*通用样式*/
+page {
+  background:#f3f3f3;
+}
+.add-item{
+  display:block;
+  position:relative;
+  margin-top:10rpx;
+  margin-bottom:20rpx;
+}
+.icon{
+    width:60rpx;
+    height:60rpx;
+    margin-bottom:-16rpx;
+    margin-right:13rpx;
+}
+.into{
+  width:30rpx;
+  height:30rpx;
+  position:absolute;
+  top:32rpx;
+  right:31rpx;
+}
+.contacts-item{
+  border-bottom:1rpx #efefef dashed;
+}
+.headportrait,.information{
+  float:left;
+}
+.edit{
+  float: right;
+  border-left:1rpx #ccc solid;
+  padding-left:2em;
+  margin-top:27rpx;
+}
+.headportrait{
+  text-align:center;
+  width:80rpx;
+  height:80rpx;
+  background-color:#8cf6fb;
+  color:#fff;
+  font-weight:600;
+  border-radius:50%;
+}
+.headportrait text{
+  overflow:hidden;
+  text-overflow:inherit;
+  white-space:nowrap;
+  width:44rpx;
+  display:inline-block;
+  font-size:43rpx;
+  height:43rpx;
+  padding-top:21.5rpx;
+}
+.information{
+  margin-left: 15rpx;
+}
+.information text{
+  display:block;
+  line-height:43rpx;
+  color:#4e4e4e;
+}
+.edit-img{
+  margin-top:-13rpx;
+}
+</style>
