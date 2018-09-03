@@ -8,8 +8,8 @@
 		"newFeature": true
 	},
 	"compileType": "miniprogram",
-	"appid": "wx0c0a9004e7068154",
-	"projectname": "feipian",
+	"appid": "wx467ca225872f65ca",
+	"projectname": "%E9%A3%9E%E7%BF%A9%E5%9B%BD%E9%99%85%E7%89%A9%E6%B5%81",
 	"miniprogramRoot": "./dist",
 	"condition": {
 		"search": {
@@ -28,10 +28,10 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 3,
+			"current": 4,
 			"list": [
 				{
-					"id": -1,
+					"id": 0,
 					"name": "物流详情",
 					"pathName": "pages/orderDetails",
 					"query": "orderNum=BS057110017CN"
@@ -51,7 +51,14 @@
 				{
 					"id": -1,
 					"name": "我的界面",
-					"pathName": "pages/personal"
+					"pathName": "pages/personal",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "查询消费额",
+					"pathName": "pages/queryQuota",
+					"query": "orderNum=BS057110017CN"
 				}
 			]
 		}

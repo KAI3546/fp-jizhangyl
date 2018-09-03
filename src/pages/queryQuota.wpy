@@ -10,15 +10,15 @@
           <view class="main-itm">
             <p class="main-itm-title">个人跨境电商包裹</p>
             <ol>
-              <li>01.单个包裹不能超过2000元。</li>
-              <li>02.个人年度消费额不能超过20000元。</li>
+              <li><i class="icon"></i>单个包裹不能超过2000元。</li>
+              <li><i class="icon"></i>个人年度消费额不能超过20000元。</li>
             </ol>
           </view>
           <view class="main-itm">
             <p class="main-itm-title">如何查询个人额度</p>
             <ol>
-              <li>01.复制下方海关总署的官网进行查询 <text class="link" selectable="true" style="word-break: break-all;">{{link||''}}</text> <!-- 复制的对象--></li>
-              <li>02.打开safari或其他手机浏览器进行访问。</li>
+              <li>1. 复制下方海关总署的官网进行查询 <text class="link" selectable="true" style="word-break: break-all;">{{link||''}}</text> <!-- 复制的对象--></li>
+              <li>2. 打开safari或其他手机浏览器进行访问。</li>
             </ol>
           </view>
           <view>
@@ -120,7 +120,7 @@ li{
   text-indent:2em;
   display:block;
   font-size:32rpx;
-  line-height:30px;
+  line-height:32px;
 }
 .link{
   color: #ff3d3d;
@@ -129,5 +129,14 @@ li{
 .copy{
   color: #fff;
   background-color: #ff3a4e;
+}
+.icon{
+  width: 15rpx;
+  height: 15rpx;
+  background: #000;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 15rpx;
+  margin-bottom:3px;
 }
 </style>

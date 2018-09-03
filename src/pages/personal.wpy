@@ -14,7 +14,7 @@
   <view class="main">
     <ol>
       <li @tap="handleusers">
-        <image src='../images/userslibrary.png' class="icon"/> 
+        <image src='../images/userslibrary.png' class="icon"/>
         <text>收件人库</text>
         <image class="into" src='../images/into.png'/>
       </li>
@@ -27,7 +27,7 @@
 	import wepy from 'wepy'
   export default class Personal extends wepy.page{
     data={
-     
+
     }
     onLoad () {
 
@@ -64,6 +64,7 @@ page{
   align-items: center;
   padding-top:2em;
   padding-bottom:3em;
+  height:222rpx;
 }
 
 .userinfo-avatar {
